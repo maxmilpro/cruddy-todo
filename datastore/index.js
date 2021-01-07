@@ -26,12 +26,16 @@ exports.readAll = (callback) => {
 };
 
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  fs.readdir(exports.dataDir, (err, files) => {
+    var file = _.find(files, function(fileName) { return fileName.slice(0, 5) === id; });
+    if (!file) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      fs.readFile(path.join(exports.dataDir, file), function(err, text) {
+        callback(null, {id, text: text.toString()});
+      });
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
