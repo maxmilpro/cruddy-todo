@@ -17,11 +17,16 @@ exports.create = (text, callback) => {
 
 exports.readAll = (callback) => {
   fs.readdir(exports.dataDir, (err, files) => {
-    var data = _.map(files, (text, id) => {
-      text = text.slice(0, 5);
-      return { id: text, text };
+    var data = _.map(files, (fileName) => {
+      return new Promise(function(resolve, reject) {
+        fs.readFile(path.join(exports.dataDir, fileName), function(err, text) {
+          resolve({id: fileName.slice(0, 5), text: text.toString()});
+        });
+      });
     });
-    callback(null, data);
+    Promise.all(data).then((todos) => {
+      callback(null, todos);
+    });
   });
 };
 
